@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -19,7 +20,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class S3Service implements FileService {
 
-	private final AmazonS3Client awsS3Client;
+//	private final AmazonS3Client awsS3Client;
+	private final AmazonS3 awsS3Client;
 	public static final String BUCKET_NAME = "shinyenyi-youtube-clone";
 
 //	public S3Service(AmazonS3Client awsS3Client) {
@@ -28,10 +30,10 @@ public class S3Service implements FileService {
 
 	@Override
 	public String uploadFile(MultipartFile file) {
-		
+
 		// prepare unique key
 		var filenameExtension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-		var key = UUID.randomUUID().toString() + filenameExtension;
+		var key = UUID.randomUUID().toString() + "." + filenameExtension;
 
 		var metadata = new ObjectMetadata();
 		metadata.setContentLength(file.getSize());
@@ -47,7 +49,8 @@ public class S3Service implements FileService {
 
 		awsS3Client.setObjectAcl(BUCKET_NAME, key, CannedAccessControlList.PublicRead);
 
-		return awsS3Client.getResourceUrl(BUCKET_NAME, key);
+//		return awsS3Client.getResourceUrl(BUCKET_NAME, key);
+		return awsS3Client.getUrl(BUCKET_NAME, key).toString();
 
 	}
 }
